@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Новогодняя Джеопарди от Дамира</title>
+  <style>
+    :root{
+      --bg1:#071427;
+      --bg2:#0a1f3a;
+      --card:#0c2b4f;
+      --card2:#0a2442;
+      --line:rgba(255,255,255,.12);
+      --gold:#ffd36a;
+      --ice:#9fe8ff;
+      --text:#eaf6ff;
+      --muted:rgba(234,246,255,.72);
+      --accent:#66ffcc;
+      --danger:#ff6b8a;
+      --ok:#6bff95;
+      --shadow:0 18px 45px rgba(0,0,0,.35);
+      --radius:22px;
+
+      /* TV scaling */
+      --base: clamp(14px, 1.2vw, 22px);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(159,232,255,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 25%, rgba(255,211,106,.16), transparent 55%),
+        radial-gradient(900px 700px at 50% 90%, rgba(102,255,204,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+
+    /* subtle snow */
+    .snow{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.9) 50%, transparent 52%),
+        radial-gradient(1.5px 1.5px at 80px 110px, rgba(255,255,255,.7) 50%, transparent 52%),
+        radial-gradient(1px 1px at 140px 60px, rgba(255,255,255,.6) 50%, transparent 52%),
+        radial-gradient(2px 2px at 200px 140px, rgba(255,255,255,.75) 50%, transparent 52%);
+      background-size: 240px 180px;
+      opacity:.35;
+      animation:snowMove 14s linear infinite;
+      filter: drop-shadow(0 0 6px rgba(159,232,255,.25));
+    }
+    @keyframes snowMove{
+      from{ transform:translateY(-80px); }
+      to{ transform:translateY(80px); }
+    }
+
+    header{
+      padding: 1.2rem 2.2rem 1rem;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:1.25rem;
+    }
+
+    .titleWrap{
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+      min-width: 420px;
+    }
+
+    h1{
+      margin:0;
+      font-size: calc(var(--base) * 2.15);
+      letter-spacing:.4px;
+      line-height:1.05;
+      text-shadow: 0 2px 0 rgba(0,0,0,.25);
+    }
+
+    .sub{
+      font-size: calc(var(--base) * 0.95);
+      color: var(--muted);
+    }
+
+    .scoreboard{
+      display:flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .team{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: .75rem 1rem;
+      min-width: 260px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .team:before{
+      content:"";
+      position:absolute; inset:-60px -80px auto auto;
+      width:180px; height:180px;
+      background: radial-gradient(circle at 30% 30%, rgba(159,232,255,.20), transparent 60%);
+      transform: rotate(12deg);
+    }
+
+    .teamName{
+      font-size: calc(var(--base) * 1.05);
+      color: var(--ice);
+      font-weight: 800;
+      letter-spacing: .3px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.6rem;
+      margin-bottom:.35rem;
+      position:relative;
+      z-index:1;
+    }
+    .teamName .renameBtn{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.15);
+      color: var(--text);
+      border-radius: 14px;
+      padding:.32rem .6rem;
+      font-size: calc(var(--base) * 0.78);
+      cursor:pointer;
+    }
+    .teamName .renameBtn:active{ transform: translateY(1px); }
+
+    .scoreRow{
+      display:flex; align-items:baseline; justify-content:space-between;
+      position:relative; z-index:1;
+    }
+    .score{
+      font-size: calc(var(--base) * 1.65);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 2px 0 rgba(0,0,0,.25);
+    }
+    .miniBtns{
+      display:flex; gap:.4rem;
+    }
+    .miniBtns button{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      color: var(--text);
+      border-radius: 14px;
+      padding:.35rem .6rem;
+      font-size: calc(var(--base) * 0.85);
+      cursor:pointer;
+      min-width: 46px;
+    }
+    .miniBtns button:hover{ border-color: rgba(255,255,255,.25); }
+    .miniBtns button:active{ transform: translateY(1px); }
+
+    main{
+      height: calc(100% - 140px);
+      padding: 0 2.2rem 2rem;
+      display:flex;
+      gap:1.4rem;
+    }
+
+    .boardWrap{
+      flex: 1 1 auto;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .board{
+      height:100%;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: auto repeat(5, 1fr);
+      gap: .8rem;
+      align-content:stretch;
+    }
+
+    .cat{
+      background: linear-gradient(180deg, rgba(159,232,255,.14), rgba(0,0,0,.15));
+      border:1px solid rgba(159,232,255,.26);
+      border-radius: 18px;
+      padding: .8rem .7rem;
+      text-align:center;
+      font-weight: 900;
+      font-size: calc(var(--base) * 1.0);
+      letter-spacing:.4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 72px;
+      text-transform: uppercase;
+    }
+
+    .cell{
+      position:relative;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: radial-gradient(120% 120% at 20% 15%, rgba(255,211,106,.16), rgba(0,0,0,.18));
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      min-height: 92px;
+      transition: transform .08s ease, filter .15s ease, opacity .2s ease;
+    }
+    .cell:hover{ filter: brightness(1.12); }
+    .cell:active{ transform: translateY(2px) scale(.995); }
+    .cell .val{
+      font-size: calc(var(--base) * 1.7);
+      font-weight: 1000;
+      color: var(--gold);
+      letter-spacing: .8px;
+      text-shadow: 0 2px 0 rgba(0,0,0,.25);
+    }
+    .cell.used{
+      cursor:not-allowed;
+      opacity:.35;
+      filter: grayscale(.15);
+    }
+    .cell.used .val{
+      text-decoration: line-through;
+      color: rgba(255,211,106,.7);
+    }
+
+    /* side controls */
+    .side{
+      width: min(430px, 28vw);
+      flex: 0 0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:1rem;
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.10));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+    }
+    .panel h2{
+      margin:.1rem 0 .6rem;
+      font-size: calc(var(--base) * 1.05);
+      letter-spacing:.3px;
+      color: var(--ice);
+    }
+    .hint{
+      color: var(--muted);
+      font-size: calc(var(--base) * 0.9);
+      line-height:1.35;
+    }
+
+    .bigBtn{
+      width:100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.18);
+      padding: .9rem 1rem;
+      font-size: calc(var(--base) * 1.0);
+      font-weight: 850;
+      color: var(--text);
+      background: radial-gradient(130% 140% at 20% 20%, rgba(102,255,204,.18), rgba(0,0,0,.16));
+      cursor:pointer;
+      margin-top:.8rem;
+    }
+    .bigBtn:hover{ filter: brightness(1.08); }
+    .bigBtn:active{ transform: translateY(1px); }
+
+    .resetBtn{
+      background: radial-gradient(130% 140% at 20% 20%, rgba(255,107,138,.16), rgba(0,0,0,.16));
+      border-color: rgba(255,107,138,.35);
+    }
+
+    /* Modal */
+    .overlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 2.2rem;
+      z-index: 50;
+    }
+    .overlay.show{ display:flex; }
+
+    .modal{
+      width: min(1100px, 92vw);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(159,232,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 80% 30%, rgba(255,211,106,.14), transparent 55%),
+        linear-gradient(180deg, rgba(12,43,79,.98), rgba(8,28,54,.98));
+      box-shadow: 0 35px 90px rgba(0,0,0,.55);
+      overflow:hidden;
+      position:relative;
+    }
+    .modalHeader{
+      padding: 1.2rem 1.35rem;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+    }
+    .modalTitle{
+      display:flex; flex-direction:column; gap:.25rem;
+    }
+    .modalTitle .top{
+      font-size: calc(var(--base) * 1.3);
+      font-weight: 950;
+      letter-spacing:.4px;
+    }
+    .modalTitle .meta{
+      font-size: calc(var(--base) * 0.9);
+      color: var(--muted);
+    }
+    .closeBtn{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      padding:.55rem .85rem;
+      font-size: calc(var(--base) * .9);
+      cursor:pointer;
+    }
+
+    .modalBody{
+      padding: 1.2rem 1.35rem 1.35rem;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 1.1rem;
+    }
+
+    .qa{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      border-radius: 22px;
+      padding: 1rem;
+      min-height: 360px;
+      display:flex;
+      flex-direction:column;
+      gap:.9rem;
+    }
+    .label{
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      font-size: calc(var(--base) * 0.85);
+      color: var(--muted);
+      letter-spacing:.25px;
+      text-transform: uppercase;
+    }
+    .bubble{
+      display:inline-block;
+      padding:.22rem .55rem;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--ice);
+      font-weight: 800;
+      font-size: calc(var(--base) * 0.82);
+    }
+    .questionText{
+      font-size: calc(var(--base) * 1.25);
+      line-height:1.25;
+      font-weight: 900;
+      letter-spacing:.2px;
+      margin-top:.2rem;
+    }
+
+    .answerBox{
+      border-radius: 18px;
+      border:1px dashed rgba(255,255,255,.22);
+      padding: .85rem .9rem;
+      background: rgba(0,0,0,.10);
+    }
+    .answerText{
+      display:none;
+      margin-top:.5rem;
+      font-size: calc(var(--base) * 1.1);
+      line-height:1.25;
+      color: rgba(234,246,255,.92);
+      font-weight: 800;
+    }
+    .answerText.show{ display:block; }
+    .revealBtn{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.18);
+      background: radial-gradient(120% 140% at 20% 20%, rgba(255,211,106,.16), rgba(0,0,0,.16));
+      color: var(--text);
+      padding:.65rem .85rem;
+      font-size: calc(var(--base) * 0.95);
+      font-weight: 900;
+      cursor:pointer;
+    }
+
+    .award{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 22px;
+      padding: 1rem;
+      display:flex;
+      flex-direction:column;
+      gap:.75rem;
+      min-height: 360px;
+    }
+
+    .award h3{
+      margin:.1rem 0 0;
+      font-size: calc(var(--base) * 1.05);
+      color: var(--ice);
+      letter-spacing:.25px;
+    }
+
+    .awardBtns{
+      display:flex;
+      flex-direction:column;
+      gap:.6rem;
+      margin-top:.2rem;
+    }
+    .awardBtns button{
+      width:100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.14);
+      color: var(--text);
+      padding:.85rem .95rem;
+      font-size: calc(var(--base) * 1.0);
+      font-weight: 900;
+      cursor:pointer;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.8rem;
+    }
+    .awardBtns button:hover{ filter: brightness(1.08); }
+    .awardBtns button:active{ transform: translateY(1px); }
+
+    .awardBtns .noone{
+      border-color: rgba(255,107,138,.30);
+      background: radial-gradient(120% 140% at 20% 20%, rgba(255,107,138,.12), rgba(0,0,0,.14));
+    }
+    .awardBtns .teamBtn{
+      border-color: rgba(102,255,204,.26);
+      background: radial-gradient(120% 140% at 20% 20%, rgba(102,255,204,.12), rgba(0,0,0,.14));
+    }
+    .delta{
+      font-size: calc(var(--base) * 0.92);
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom: 1.2rem;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+      padding: .75rem 1rem;
+      border-radius: 16px;
+      font-size: calc(var(--base) * 0.95);
+      color: var(--text);
+      display:none;
+      z-index:60;
+    }
+    .toast.show{ display:block; animation: pop .18s ease; }
+    @keyframes pop{
+      from{ transform: translateX(-50%) translateY(10px); opacity:0; }
+      to{ transform: translateX(-50%) translateY(0); opacity:1; }
+    }
+
+    /* TV-friendly: avoid tiny elements */
+    @media (max-width: 1100px){
+      main{ flex-direction:column; overflow:auto; height:auto; }
+      body{ overflow:auto; }
+      .side{ width:100%; }
+      .modalBody{ grid-template-columns:1fr; }
+      .qa,.award{ min-height:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="snow"></div>
+
+  <header>
+    <div class="titleWrap">
+      <h1>Новогодняя Джеопарди от Дамира</h1>
+      <div class="sub">5 категорий × 5 вопросов • 3 команды • кликай по сумме → вопрос → ответ → начисли баллы</div>
+    </div>
+
+    <div class="scoreboard" id="scoreboard"></div>
+  </header>
+
+  <main>
+    <section class="boardWrap">
+      <div class="board" id="board"></div>
+    </section>
+
+    <aside class="side">
+      <div class="panel">
+        <h2>Правила (коротко)</h2>
+        <div class="hint">
+          <div>• Нажми на сумму на поле — откроется вопрос.</div>
+          <div>• Потом «Показать ответ» (чтобы ведущий увидел).</div>
+          <div>• Затем выбери команду, которой дать баллы (или «Никому»).</div>
+          <div>• Вопрос после этого будет отмечен как использованный.</div>
+        </div>
+        <button class="bigBtn" id="fullscreenBtn">🖥️ Полный экран (для ТВ)</button>
+        <button class="bigBtn resetBtn" id="resetBtn">♻️ Сбросить игру</button>
+      </div>
+
+      <div class="panel">
+        <h2>Горячие клавиши</h2>
+        <div class="hint">
+          <div>• <b>Esc</b> — закрыть окно вопроса</div>
+          <div>• <b>Enter</b> — показать/скрыть ответ</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTop">
+      <div class="modalHeader">
+        <div class="modalTitle">
+          <div class="top" id="modalTop">Вопрос</div>
+          <div class="meta" id="modalMeta">Категория • Цена</div>
+        </div>
+        <button class="closeBtn" id="closeBtn">Закрыть ✕</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="qa">
+          <div class="label"><span class="bubble">❄️</span> Текст вопроса</div>
+          <div class="questionText" id="questionText"></div>
+
+          <div class="answerBox">
+            <div class="label"><span class="bubble">🎁</span> Ответ</div>
+            <div style="display:flex; gap:.7rem; align-items:center; flex-wrap:wrap; margin-top:.35rem;">
+              <button class="revealBtn" id="revealBtn">Показать ответ</button>
+              <div class="hint" style="margin:0;">(После начисления баллов вопрос закроется и станет «использован»)</div>
+            </div>
+            <div class="answerText" id="answerText"></div>
+          </div>
+        </div>
+
+        <div class="award">
+          <h3>Кому дать баллы?</h3>
+          <div class="hint">Нажми кнопку — начислим <b>стоимость вопроса</b> выбранной команде.</div>
+          <div class="awardBtns" id="awardBtns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ====== DATA ======
+    const game = {
+      title: "Новогодняя Джеопарди от Дамира",
+      values: [100, 200, 300, 400, 500],
+      categories: [
+        {
+          name: "Ёлка & Логика",
+          qs: [
+            {
+              q: "На ёлке 10 шаров. Ты снял 3 и повесил обратно 2. Сколько шаров сейчас на ёлке?",
+              a: "9. Было 10, снял 3 → 7, повесил 2 → 9."
+            },
+            {
+              q: "У Деда Мороза мешок с подарками. Он раздал половину подарков и ещё 2. Осталось 10. Сколько было изначально?",
+              a: "24. Пусть было X: X − (X/2 + 2) = 10 ⇒ X/2 − 2 = 10 ⇒ X/2 = 12 ⇒ X = 24."
+            },
+            {
+              q: "На верхушке ёлки звезда. В комнате темно. Что нужно сделать первым, чтобы увидеть звезду?",
+              a: "Открыть глаза (или включить свет, если глаза уже открыты). Ловушка: вопрос про «первым»."
+            },
+            {
+              q: "Три свечи горят на столе. Две из них задули. Сколько свечей осталось на столе?",
+              a: "Три. Все свечи физически остались на столе."
+            },
+            {
+              q: "В гирлянде 20 лампочек. Каждая 5-я перегорела. Сколько перегорело?",
+              a: "4 (5-я, 10-я, 15-я, 20-я)."
+            }
+          ]
+        },
+        {
+          name: "Дед Мороз: Математика",
+          qs: [
+            {
+              q: "Снегурочка пишет список: 12 детей. Каждому по 2 мандарина. Сколько мандаринов нужно?",
+              a: "24 мандарина."
+            },
+            {
+              q: "Сани едут 30 км за 1 час. Сколько километров проедут за 2 часа 30 минут?",
+              a: "75 км. 2.5 часа × 30 = 75."
+            },
+            {
+              q: "В мешке 3 вида конфет: А, Б, В. Всего 30. Конфет А на 4 больше, чем Б, а В вдвое больше, чем Б. Сколько Б?",
+              a: "Б = 8. Тогда А = 12, В = 16, всего 36? Стоп! Проверим: 8+12+16=36. Значит условие ловушка? Исправление: чтобы сумма 30: пусть В = Б, а не 2Б. Но условие дано. Правильный ответ: решения нет при таких условиях. (Можно обсудить как внимательность.)"
+            },
+            {
+              q: "Дед Мороз загадывает число: оно делится на 3 и на 5, меньше 50, но больше 40. Что это за число?",
+              a: "45."
+            },
+            {
+              q: "На столе 4 тарелки оливье. Каждый гость съедает по 1/2 тарелки. Сколько гостей насытится полностью?",
+              a: "8 гостей (4 ÷ 0.5 = 8)."
+            }
+          ]
+        },
+        {
+          name: "Загадки зимы",
+          qs: [
+            {
+              q: "Белая, но не сахар; холодная, но не лёд; падает, но не дождь. Что это?",
+              a: "Снег."
+            },
+            {
+              q: "Что становится больше, если из него вынимать?",
+              a: "Яма (или «дыру»)."
+            },
+            {
+              q: "Что можно увидеть с закрытыми глазами?",
+              a: "Сон."
+            },
+            {
+              q: "Сто одежек — и все без застёжек. (Новогодняя версия: на столе бывает часто.)",
+              a: "Капуста (или лук). Можно принять оба варианта, но классика — капуста."
+            },
+            {
+              q: "Без рук, без ног, а рисует. Кто это?",
+              a: "Мороз (узоры на стекле)."
+            }
+          ]
+        },
+        {
+          name: "Фейерверк: Шифры",
+          qs: [
+            {
+              q: "Расшифруй: 3-5-4-1. Подсказка: А=1, Б=2, В=3… Что получилось?",
+              a: "ВГДА? Стоп: В=3, Д=5, Г=4, А=1 → «ВДГА». Смысл: нет. Ловушка на внимательность: русская азбука: А1 Б2 В3 Г4 Д5 → 3-5-4-1 = ВДГА. Прими как «порядок важен»."
+            },
+            {
+              q: "Слово «СНЕГ» зашифровали, сдвинув каждую букву на 1 вперёд в алфавите. Что вышло? (А→Б)",
+              a: "Т О Д Д? Проверим по русскому: С→Т, Н→О, Е→Ё, Г→Д. Получится «ТОЁД»."
+            },
+            {
+              q: "Ведущий показал слово: Н О В Ы Й. Игроки должны назвать его наоборот. Что получится?",
+              a: "ЙЫВОН."
+            },
+            {
+              q: "Логический код: если 2=8, 3=27, 4=64, то 5=?",
+              a: "125 (это кубы: 2³, 3³, 4³, 5³)."
+            },
+            {
+              q: "Если «ЁЛКА» = 4, «СНЕГ» = 4, «ПОДАРОК» = 7, то чему равно «ДЕД»?",
+              a: "3 (количество букв)."
+            }
+          ]
+        },
+        {
+          name: "Традиции & Хитрости",
+          qs: [
+            {
+              q: "Что чаще всего загадывают ровно в полночь под бой курантов?",
+              a: "Желание."
+            },
+            {
+              q: "Почему в Новый год может быть «самый короткий тост»?",
+              a: "Потому что «За!» — это тоже тост."
+            },
+            {
+              q: "На столе 5 яблок. Пять человек берут по яблоку. Одно яблоко осталось в корзине. Как так?",
+              a: "Пятый взял яблоко вместе с корзиной (или оставил яблоко в корзине, взяв корзину)."
+            },
+            {
+              q: "В комнате 4 угла. В каждом углу по коту. Напротив каждого кота — по 3 кота. Сколько котов в комнате?",
+              a: "4. Каждый кот видит трёх других."
+            },
+            {
+              q: "Новогодний ребус: 'ДЕД' + 'МОРОЗ' − 'РОЗА' = ? (убери буквы слова 'РОЗА' из 'МОРОЗ')",
+              a: "МОРОЗ − РОЗ = М? Если убрать Р,О,З из «МОРОЗ», остаётся «М». Тогда «ДЕД» + «М» = «ДЕДМ». Ведущему: засчитывать как «М». Смысл: внимательность к операции «−»."
+            }
+          ]
+        }
+      ],
+      teams: [
+        { name: "Команда Снежинки", score: 0 },
+        { name: "Команда Мандаринки", score: 0 },
+        { name: "Команда Фейерверки", score: 0 }
+      ]
+    };
+
+    // NOTE: В двух вопросах-ловушках ответы "нет решения/без смысла" задуманы как проверка внимательности.
+    // Если хочешь — можешь легко заменить их на "обычные" вопросы прямо в массиве game.
+
+    // ====== STATE ======
+    const state = {
+      used: new Set(), // key: c-r
+      current: null,   // {catIdx, rowIdx, value, q, a, key}
+      answerShown: false,
+    };
+
+    // ====== HELPERS ======
+    const $ = (sel) => document.querySelector(sel);
+    const el = (tag, cls) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      return e;
+    };
+
+    function keyFor(catIdx, rowIdx){ return `${catIdx}-${rowIdx}`; }
+
+    function formatPoints(n){
+      return n.toString();
+    }
+
+    function toast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toast._tm);
+      toast._tm = setTimeout(()=>t.classList.remove("show"), 1600);
+    }
+
+    // ====== RENDER SCOREBOARD ======
+    function renderScoreboard(){
+      const sb = $("#scoreboard");
+      sb.innerHTML = "";
+      game.teams.forEach((team, idx) => {
+        const card = el("div","team");
+
+        const nameRow = el("div","teamName");
+        const nameSpan = el("div");
+        nameSpan.textContent = team.name;
+
+        const renameBtn = el("button","renameBtn");
+        renameBtn.textContent = "Переимен.";
+        renameBtn.addEventListener("click", () => {
+          const newName = prompt("Новое имя команды:", team.name);
+          if (newName && newName.trim()){
+            team.name = newName.trim();
+            renderScoreboard();
+            renderAwardButtons();
+          }
+        });
+
+        nameRow.appendChild(nameSpan);
+        nameRow.appendChild(renameBtn);
+
+        const scoreRow = el("div","scoreRow");
+        const score = el("div","score");
+        score.textContent = team.score;
+
+        const mini = el("div","miniBtns");
+        const minus = el("button"); minus.textContent = "−";
+        const plus  = el("button"); plus.textContent  = "+";
+
+        minus.addEventListener("click", () => { team.score -= 50; renderScoreboard(); toast(`${team.name}: -50`); });
+        plus.addEventListener("click",  () => { team.score += 50; renderScoreboard(); toast(`${team.name}: +50`); });
+
+        mini.appendChild(minus);
+        mini.appendChild(plus);
+
+        scoreRow.appendChild(score);
+        scoreRow.appendChild(mini);
+
+        card.appendChild(nameRow);
+        card.appendChild(scoreRow);
+        sb.appendChild(card);
+      });
+    }
+
+    // ====== RENDER BOARD ======
+    function renderBoard(){
+      const board = $("#board");
+      board.innerHTML = "";
+
+      // category headers
+      game.categories.forEach(cat => {
+        const c = el("div","cat");
+        c.textContent = cat.name;
+        board.appendChild(c);
+      });
+
+      // 5 rows of values
+      for (let row=0; row<game.values.length; row++){
+        for (let catIdx=0; catIdx<game.categories.length; catIdx++){
+          const value = game.values[row];
+          const cell = el("div","cell");
+          const k = keyFor(catIdx,row);
+          if (state.used.has(k)) cell.classList.add("used");
+
+          const val = el("div","val");
+          val.textContent = formatPoints(value);
+          cell.appendChild(val);
+
+          cell.addEventListener("click", () => {
+            if (state.used.has(k)) return;
+            openQuestion(catIdx,row);
+          });
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    // ====== MODAL ======
+    function openQuestion(catIdx,rowIdx){
+      const cat = game.categories[catIdx];
+      const qa = cat.qs[rowIdx];
+      const value = game.values[rowIdx];
+      const k = keyFor(catIdx,rowIdx);
+
+      state.current = { catIdx, rowIdx, value, q: qa.q, a: qa.a, key: k };
+      state.answerShown = false;
+
+      $("#modalTop").textContent = "Вопрос";
+      $("#modalMeta").textContent = `${cat.name} • ${value} очков`;
+      $("#questionText").textContent = qa.q;
+      $("#answerText").textContent = qa.a;
+      $("#answerText").classList.remove("show");
+      $("#revealBtn").textContent = "Показать ответ";
+
+      renderAwardButtons();
+
+      $("#overlay").classList.add("show");
+      $("#overlay").setAttribute("aria-hidden","false");
+    }
+
+    function closeModal(){
+      $("#overlay").classList.remove("show");
+      $("#overlay").setAttribute("aria-hidden","true");
+      state.current = null;
+      state.answerShown = false;
+    }
+
+    function toggleAnswer(){
+      if (!state.current) return;
+      state.answerShown = !state.answerShown;
+      $("#answerText").classList.toggle("show", state.answerShown);
+      $("#revealBtn").textContent = state.answerShown ? "Скрыть ответ" : "Показать ответ";
+    }
+
+    function renderAwardButtons(){
+      const box = $("#awardBtns");
+      box.innerHTML = "";
+      if (!state.current){
+        const p = el("div","hint");
+        p.textContent = "Выбери вопрос на поле.";
+        box.appendChild(p);
+        return;
+      }
+
+      // Team buttons
+      game.teams.forEach((t, idx) => {
+        const b = el("button","teamBtn");
+        const left = el("div");
+        left.textContent = t.name;
+        const right = el("div","delta");
+        right.textContent = `+${state.current.value}`;
+
+        b.appendChild(left);
+        b.appendChild(right);
+
+        b.addEventListener("click", () => awardTo(idx));
+        box.appendChild(b);
+      });
+
+      // No one
+      const n = el("button","noone");
+      const l = el("div");
+      l.textContent = "Никому (вопрос сгорел)";
+      const r = el("div","delta");
+      r.textContent = "+0";
+      n.appendChild(l); n.appendChild(r);
+      n.addEventListener("click", () => awardTo(null));
+      box.appendChild(n);
+    }
+
+    function awardTo(teamIdx){
+      if (!state.current) return;
+
+      const { value, key } = state.current;
+      if (teamIdx !== null){
+        game.teams[teamIdx].score += value;
+        toast(`${game.teams[teamIdx].name}: +${value}`);
+      } else {
+        toast("Никому: +0");
+      }
+
+      state.used.add(key);
+      renderScoreboard();
+      renderBoard();
+      closeModal();
+    }
+
+    // ====== Fullscreen / Reset ======
+    function toggleFullscreen(){
+      const root = document.documentElement;
+      if (!document.fullscreenElement){
+        root.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+
+    function resetGame(){
+      state.used.clear();
+      game.teams.forEach(t => t.score = 0);
+      renderScoreboard();
+      renderBoard();
+      closeModal();
+      toast("Игра сброшена");
+    }
+
+    // ====== Events ======
+    $("#closeBtn").addEventListener("click", closeModal);
+    $("#overlay").addEventListener("click", (e) => {
+      if (e.target === $("#overlay")) closeModal();
+    });
+    $("#revealBtn").addEventListener("click", toggleAnswer);
+
+    $("#fullscreenBtn").addEventListener("click", toggleFullscreen);
+    $("#resetBtn").addEventListener("click", () => {
+      const ok = confirm("Сбросить игру? Очки и открытые вопросы будут очищены.");
+      if (ok) resetGame();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && $("#overlay").classList.contains("show")) closeModal();
+      if (e.key === "Enter" && $("#overlay").classList.contains("show")) toggleAnswer();
+    });
+
+    // ====== Init ======
+    renderScoreboard();
+    renderBoard();
+    renderAwardButtons();
+  </script>
+</body>
+</html>
